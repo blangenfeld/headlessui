@@ -5,6 +5,10 @@ export function useWindowEvent<TType extends keyof WindowEventMap>(
   listener: (this: Window, ev: WindowEventMap[TType]) => any,
   options?: boolean | AddEventListenerOptions
 ) {
-  window.addEventListener(type, listener, options)
-  onUnmounted(() => window.removeEventListener(type, listener, options))
+  const wrappedListener = function(this: Window, ev: WindowEventMap[TType]) {
+    console.log(this, ev)
+    return listener.bind(this)(ev)
+  }
+  window.addEventListener(type, wrappedListener, options)
+  onUnmounted(() => window.removeEventListener(type, wrappedListener, options))
 }
